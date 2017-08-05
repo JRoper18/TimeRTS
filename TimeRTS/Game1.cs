@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TimeRTS.Game;
 
 namespace TimeRTS
 {
@@ -27,8 +28,12 @@ namespace TimeRTS
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            GameObjectTexture.content = Content;
+            GameRenderer.Initialize();
 
+            //Don't put anything after this line (after base.Initialize())
             base.Initialize();
+
         }
 
         /// <summary>
@@ -41,6 +46,7 @@ namespace TimeRTS
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            GameRenderer.LoadAllContent();
         }
 
         /// <summary>
@@ -76,7 +82,7 @@ namespace TimeRTS
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
-
+            GameRenderer.Render(GameState.Instance, spriteBatch);
             base.Draw(gameTime);
         }
     }

@@ -16,20 +16,9 @@ namespace TimeRTS.Game
     class MapTile : GameObject
     {
         public MapTileType type;
-        public MapTile(Vector3 position, MapTileType type = MapTileType.GRASS)
-        {
+        public MapTile(Vector3 position, MapTileType type = MapTileType.GRASS) : base(position, "GrassTile"){
             this.type = type;
-            this.position = position;
         }
-        override
-        public void LoadContent(ContentManager content)
-        {
-            
-        }
-        override
-        public void Draw()
-        {
-
-        }
+       
     }
 }

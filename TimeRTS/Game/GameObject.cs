@@ -14,12 +14,13 @@ namespace TimeRTS.Game
     abstract class GameObject
     {
         public Vector3 position;
-        private const Texture2D cubeTexture = new Texture2D(); //Replace with a default texture
-        abstract public void LoadContent(Microsoft.Xna.Framework.Content.ContentManager content);
-        abstract public void Draw();
-        public Texture2D getTextureFromDirection(int dir)
-        {
-            
+        private GameObjectTexture texture;
+        public GameObject(Vector3 position, String textureName) {
+            this.position = position;
+            this.texture = GameRenderer.textures[textureName];
+        }
+        virtual public Texture2D GetCurrentTexture(int cameraDir) {
+            return this.texture.spriteSheet;
         }
     }
 }

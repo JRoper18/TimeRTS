@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Content;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,15 +12,13 @@ namespace TimeRTS.Game
         public static GameState instance;
         private static readonly Object lockObj = new Object();
 
-        private MapState[] mapsOverTime;
-
-        private GameState()
-        {
-
+        private MapState[] mapsOverTime = new MapState[] {new MapState(new Microsoft.Xna.Framework.Vector3(2,2,2))};
+        public ContentManager content;
+        private GameState(){
+            
         }
 
-        public MapState getMapAtTime(int time)
-        {
+        public MapState getMapAtTime(int time){
             return this.mapsOverTime[time];
         }
 
