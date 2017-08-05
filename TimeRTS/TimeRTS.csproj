@@ -48,8 +48,9 @@
     <Compile Include="Game\GameObjectTexture.cs" />
     <Compile Include="Game\GameRenderer.cs" />
     <Compile Include="Game\GameState.cs" />
+    <Compile Include="Game\IsometricGameObject.cs" />
     <Compile Include="Game\MapState.cs" />
-    <Compile Include="Game\MapTile.cs" />
+    <Compile Include="Game\RenderData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,8 +22,8 @@ namespace TimeRTS.Game
             Vector3 size = map.getSize();
             for(int x = 0; x<size.X; x++){
                 for (int y = 0; y < size.Y; y++){
-                    Texture2D tempTexture = map.getTileAtPosition(new Vector3(x, y, 0)).GetCurrentTexture(0);
-                    spriteBatch.Draw(tempTexture, Vector2.Zero, Color.White);
+                    RenderData renderData = map.getTileAtPosition(new Vector3(x, y, 0)).GetRenderData(0);
+                    spriteBatch.Draw(renderData.texture, Vector2.Zero, renderData.sourceRectangle, Color.White);
                 }
             }
             spriteBatch.End();

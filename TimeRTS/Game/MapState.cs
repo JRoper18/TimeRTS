@@ -16,7 +16,7 @@ namespace TimeRTS.Game
             {
                 for(int y = 0; y<size.Y; y++)
                 {
-                    this.map[x, y, 0] = new MapTile(new Vector3(x, y, 0));
+                    this.map[x, y, 0] = new IsometricGameObject(new Vector3(x, y, 0));
                 }
             }
         }
