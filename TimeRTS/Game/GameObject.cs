@@ -14,13 +14,13 @@ namespace TimeRTS.Game
     class GameObject
     {
         public Vector3 position;
-        protected GameObjectTexture texture;
-        public GameObject(Vector3 position, String textureName)  {
+        private GraphicsComponent graphics;
+        public GameObject(Vector3 position, GraphicsComponent graphics)  {
             this.position = position;
-            this.texture = GameRenderer.textures[textureName];
+            this.graphics = graphics;
         }
-        virtual public RenderData GetRenderData(int cameraDir) {
-            return new RenderData(this.texture.spriteSheet);
+        public RenderData GetRenderData() {
+            return this.graphics.GetRenderData();
         }
     }
 }

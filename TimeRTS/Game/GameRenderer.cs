@@ -22,8 +22,9 @@ namespace TimeRTS.Game
             Vector3 size = map.getSize();
             for(int x = 0; x<size.X; x++){
                 for (int y = 0; y < size.Y; y++){
-                    RenderData renderData = map.getTileAtPosition(new Vector3(x, y, 0)).GetRenderData(0);
-                    spriteBatch.Draw(renderData.texture, Vector2.Zero, renderData.sourceRectangle, Color.White);
+                    GameObject tile = map.getTileAtPosition(new Vector3(x, y, 0));
+                    RenderData renderData = tile.GetRenderData();
+                    spriteBatch.Draw(renderData.texture, pointToIsometric(tile.position), renderData.sourceRectangle, Color.White);
                 }
             }
             spriteBatch.End();
@@ -32,6 +33,14 @@ namespace TimeRTS.Game
             foreach (KeyValuePair<string, GameObjectTexture> entry in textures) {
                 entry.Value.LoadContent();
             }
+        }
+
+        private static Vector2 pointToIsometric(Vector3 point) {
+            float isoX = point.X + point.Z;
+            float isoY = point.Y + point.Z;
+            float newX = (float) ((isoX - isoY) * Math.Cos(Math.PI / 6));
+            float newY = (isoX + isoY) / 2;
+            return new Vector2(newX, newY);
         }
     }
 }
