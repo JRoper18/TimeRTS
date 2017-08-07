@@ -16,7 +16,7 @@ namespace TimeRTS.Game
             {
                 for(int y = 0; y<size.Y; y++)
                 {
-                    this.map[x, y, 0] = new GameObject(new Vector3(x, y, 0));
+                    this.map[x, y, 0] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_GRASS, new Vector3(x, y, 0));
                 }
             }
         }

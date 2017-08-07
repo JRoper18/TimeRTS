@@ -45,11 +45,12 @@
   <ItemGroup>
     <Compile Include="Game1.cs" />
     <Compile Include="Game\GameObject.cs" />
+    <Compile Include="Game\GameObjectFactory.cs" />
     <Compile Include="Game\GameObjectTexture.cs" />
     <Compile Include="Game\GameRenderer.cs" />
     <Compile Include="Game\GameState.cs" />
-    <Compile Include="Game\GraphicsComponent.cs" />
-    <Compile Include="Game\IsometricGraphicsComponent.cs" />
+    <Compile Include="Game\GraphicsComponents\GraphicsComponent.cs" />
+    <Compile Include="Game\GraphicsComponents\IsometricGraphicsComponent.cs" />
     <Compile Include="Game\MapState.cs" />
     <Compile Include="Game\RenderData.cs" />
     <Compile Include="Program.cs" />

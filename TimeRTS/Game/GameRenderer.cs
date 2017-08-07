@@ -11,6 +11,8 @@ namespace TimeRTS.Game
 {
     static class GameRenderer
     {
+        private const int TILE_WIDTH = 110;
+        private const int TILE_HEIGHT = 64;
         public static Dictionary<String, GameObjectTexture> textures = new Dictionary<string, GameObjectTexture>();
         public static void Initialize() {
             textures.Add("GrassTile", new GameObjectTexture("Images/sprite"));
@@ -20,11 +22,31 @@ namespace TimeRTS.Game
             spriteBatch.Begin();
             MapState map = state.getMapAtTime(0);
             Vector3 size = map.getSize();
-            for(int x = 0; x<size.X; x++){
-                for (int y = 0; y < size.Y; y++){
-                    GameObject tile = map.getTileAtPosition(new Vector3(x, y, 0));
-                    RenderData renderData = tile.GetRenderData();
-                    spriteBatch.Draw(renderData.texture, pointToIsometric(tile.position), renderData.sourceRectangle, Color.White);
+            int rows = (int)(size.X + size.Y-1);
+            for(int i = 0; i<rows; i++) {
+                int offsetX = 0;
+                int length = i+1;
+                if (i >= size.Y) {
+                    offsetX = i - (int) size.Y + 1;
+                    length = (int) size.Y - (i - (int) size.Y + 1);
+                }
+                for(int j = 0; j<length; j++) {
+                    int posX = j + offsetX;
+                    int posY = i - j;
+                    if(i >= size.Y) {
+                        posY = (int) size.Y - j - 1;
+                    }
+                    Debug.WriteLine(posX + " " + posY);
+
+                    for(int z = (int) size.Z-1; z>=0; z--) {
+                        Vector3 currentPosition = new Vector3(posX, posY, z);
+                        GameObject currentTile = map.getTileAtPosition(currentPosition);
+                        if(currentTile == null) {
+                            continue;
+                        }
+                        RenderData currentRenderData = currentTile.GetRenderData();
+                        spriteBatch.Draw(currentRenderData.texture, pointToIsometric(currentPosition), currentRenderData.sourceRectangle, Color.White);
+                    }
                 }
             }
             spriteBatch.End();
@@ -36,11 +58,11 @@ namespace TimeRTS.Game
         }
 
         private static Vector2 pointToIsometric(Vector3 point) {
-            float isoX = point.X + point.Z;
-            float isoY = point.Y + point.Z;
-            float newX = (float) ((isoX - isoY) * Math.Cos(Math.PI / 6));
-            float newY = (isoX + isoY) / 2;
-            return new Vector2(newX, newY);
+            int isoX = (int) (point.X + point.Z);
+            int isoY = (int) (point.Y + point.Z);
+            int screenX = (isoX - isoY) * TILE_WIDTH / 2;
+            int screenY = (isoY + isoX) * TILE_HEIGHT / 2;
+            return new Vector2(screenX + 500, screenY);
         }
     }
 }
