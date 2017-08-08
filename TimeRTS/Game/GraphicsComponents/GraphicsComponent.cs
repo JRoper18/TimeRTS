@@ -17,5 +17,14 @@ namespace TimeRTS.Game {
         public virtual RenderData GetRenderData() {
             return new RenderData(this.textureWrapper.spriteSheet);
         }
+        public static void RotateClockwise() {
+            cameraDir = (cameraDir + 1) % 4;
+        }
+        public static void RotateCounterClockwise() {
+            cameraDir = (cameraDir - 1) % 4;
+        }
+        public static int GetCameraDirection() {
+            return cameraDir;
+        }
     }
 }

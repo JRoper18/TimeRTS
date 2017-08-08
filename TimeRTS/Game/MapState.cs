@@ -10,6 +10,9 @@ namespace TimeRTS.Game
     class MapState
     {
         private GameObject[, ,] map;
+        public MapState(GameObject[,,] mapArray) {
+            this.map = mapArray;
+        }
         public MapState(Vector3 size){
             map = new GameObject[(int)size.X,(int)size.Y,(int)size.Z];
             for(int x = 0; x<size.X; x++)
@@ -23,6 +26,9 @@ namespace TimeRTS.Game
         public GameObject getTileAtPosition(Vector3 position)
         {
             return map[(int)position.X,(int)position.Y, (int)position.Z];
+        }
+        public GameObject[, ,] getMapClone() {
+            return (GameObject[, ,]) this.map.Clone();
         }
         public Vector3 getSize()
         {
