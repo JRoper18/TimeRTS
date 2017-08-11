@@ -11,11 +11,11 @@ namespace TimeRTS.Game
 {
     static class GameRenderer
     {
-        private const int TILE_WIDTH = 110;
-        private const int TILE_HEIGHT = 64;
+        private const int TILE_HEIGHT = 110;
+        private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
         public static Dictionary<String, GameObjectTexture> textures = new Dictionary<string, GameObjectTexture>();
         public static void Initialize() {
-            textures.Add("GrassTile", new GameObjectTexture("Images/sprite"));
+            textures.Add("GrassTile", new GameObjectTexture("Images/GrassTile"));
         }
         /// <summary>
         /// Renders the current game onto the screen. 
@@ -25,6 +25,12 @@ namespace TimeRTS.Game
         public static void Render(GameState state, SpriteBatch spriteBatch) {
             spriteBatch.Begin();
             MapState mapState = state.getMapAtTime(0);
+            if (InputHandler.WasPressed(Microsoft.Xna.Framework.Input.Keys.E)) {
+                GraphicsComponent.RotateClockwise();
+            }
+            else if (InputHandler.WasPressed(Microsoft.Xna.Framework.Input.Keys.Q)) {
+                GraphicsComponent.RotateCounterClockwise();
+            }
             GameObject[,,] mapArray = rotateMapArray(mapState.getMapClone(), GraphicsComponent.GetCameraDirection());
             MapState map = new MapState(mapArray);
             Vector3 size = map.getSize();
@@ -72,9 +78,15 @@ namespace TimeRTS.Game
             }
             spriteBatch.End();
         }
-        private static GameObject[, ,] rotateMapArray(GameObject[, ,] map, int dir) {
+        /// <summary>
+        /// Takes a map array and rotates the array by however many 90-degree segments clockwise specified. 
+        /// </summary>
+        /// <param name="map">The map to rotate</param>
+        /// <param name="clockwiseQuarterRotations">The amount of 90-degree clockwise rotations. </param>
+        /// <returns>The rotated map. </returns>
+        private static GameObject[, ,] rotateMapArray(GameObject[, ,] map, int clockwiseQuarterRotations) {
             GameObject[,,] transposedMap = new GameObject[map.GetLength(1), map.GetLength(0), map.GetLength(2)];
-            int clockwiseRotations = dir % 4;
+            int clockwiseRotations = clockwiseQuarterRotations % 4;
             //Transpose. Linear algebra is so cool. 
             for(int x = 0; x<map.GetLength(0); x++) {
                 for(int y = 0; y<map.GetLength(1); y++) {
@@ -127,7 +139,8 @@ namespace TimeRTS.Game
                     continue;
                 }
                 RenderData currentRenderData = currentTile.GetRenderData();
-                spriteBatch.Draw(currentRenderData.texture, isometricToScreen(currentPosition), currentRenderData.sourceRectangle, Color.White);
+                Vector2 screenPosition = isometricToScreen(currentPosition);
+                spriteBatch.Draw(currentRenderData.texture, new Rectangle((int) screenPosition.X, (int) screenPosition.Y, TILE_WIDTH, TILE_HEIGHT), currentRenderData.sourceRectangle, Color.White);
             }
         }
         /// <summary>
@@ -138,9 +151,9 @@ namespace TimeRTS.Game
         private static Vector2 isometricToScreen(Vector3 point) {
             int isoX = (int) (point.X + point.Z);
             int isoY = (int) (point.Y + point.Z);
-            int screenX = (isoX - isoY) * TILE_WIDTH / 2;
-            int screenY = (isoY + isoX) * TILE_HEIGHT / 2;
-            return new Vector2(screenX, screenY);
+            float screenX = (isoX - isoY) * TILE_WIDTH / 2;
+            float screenY = (isoY + isoX) * (TILE_HEIGHT / 4);
+            return new Vector2(screenX + (GameState.WINDOW_WIDTH/2), screenY);
         }
     }
 }

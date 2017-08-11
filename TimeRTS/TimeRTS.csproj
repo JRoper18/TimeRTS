@@ -51,6 +51,7 @@
     <Compile Include="Game\GameState.cs" />
     <Compile Include="Game\GraphicsComponents\GraphicsComponent.cs" />
     <Compile Include="Game\GraphicsComponents\IsometricGraphicsComponent.cs" />
+    <Compile Include="Game\InputHandler.cs" />
     <Compile Include="Game\MapState.cs" />
     <Compile Include="Game\RenderData.cs" />
     <Compile Include="Program.cs" />

@@ -16,6 +16,9 @@ namespace TimeRTS
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferHeight = GameState.WINDOW_HEIGHT;
+            graphics.PreferredBackBufferWidth = GameState.WINDOW_WIDTH;
             Content.RootDirectory = "Content";
         }
 
@@ -69,7 +72,7 @@ namespace TimeRTS
                 Exit();
 
             // TODO: Add your update logic here
-            
+            InputHandler.UpdateKeyboardState();
             base.Update(gameTime);
         }
 

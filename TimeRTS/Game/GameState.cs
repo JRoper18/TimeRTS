@@ -12,7 +12,9 @@ namespace TimeRTS.Game
         public static GameState instance;
         private static readonly Object lockObj = new Object();
 
-        private MapState[] mapsOverTime = new MapState[] {new MapState(new Microsoft.Xna.Framework.Vector3(2,10,2))};
+        private MapState[] mapsOverTime = new MapState[] {new MapState(new Microsoft.Xna.Framework.Vector3(8,8,2))};
+        public const int WINDOW_HEIGHT = 900;
+        public const int WINDOW_WIDTH = 1600;
         private GameState(){
             
         }

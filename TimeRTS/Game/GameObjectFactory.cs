@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace TimeRTS.Game {
     enum GameObjectType {
-        TILE_GRASS
+        TILE_GRASS,
+        TILE_STONE
     }
     static class GameObjectFactory {
         public static GameObject CreateGameObject(GameObjectType type, Vector3 position) {
