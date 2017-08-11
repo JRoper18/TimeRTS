@@ -19,13 +19,22 @@ namespace TimeRTS.Game {
             return new RenderData(this.texture);
         }
         public static void RotateClockwise() {
-            cameraDir = (cameraDir + 1) % 4;
+            if(cameraDir == 3) {
+                cameraDir = 0;
+            }
+            else {
+                cameraDir++;
+            }
+            Debug.WriteLine(cameraDir);
         }
         public static void RotateCounterClockwise() {
             if(cameraDir == 0) {
-                cameraDir = 4;
+                cameraDir = 3;
             }
-            cameraDir = (cameraDir - 1) % 4;
+            else {
+                cameraDir--;
+            }
+            Debug.WriteLine(cameraDir);
         }
         public static int GetCameraDirection() {
             return cameraDir;

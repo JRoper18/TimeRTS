@@ -12,7 +12,7 @@ namespace TimeRTS.Game {
         public IsometricGraphicsComponent(string textureName) : base(textureName) {
         }
         public override RenderData GetRenderData() {
-            Rectangle sourceRect = new Rectangle(0, cameraDir * TILE_CONTENT_HEIGHT, TILE_CONTENT_WIDTH, TILE_CONTENT_HEIGHT);
+            Rectangle sourceRect = new Rectangle(0, (cameraDir) * TILE_CONTENT_HEIGHT, TILE_CONTENT_WIDTH, TILE_CONTENT_HEIGHT);
             return new RenderData(this.texture, sourceRect);
         }
     }

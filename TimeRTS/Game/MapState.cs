@@ -14,6 +14,7 @@ namespace TimeRTS.Game
             this.map = mapArray;
         }
         public MapState(Vector3 size){
+            Random random = new Random();
             map = new GameObject[(int)size.X,(int)size.Y,(int)size.Z];
             for(int x = 0; x<size.X; x++)
             {
@@ -22,6 +23,7 @@ namespace TimeRTS.Game
                     this.map[x, y, 0] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_GRASS, new Vector3(x, y, 0));
                 }
             }
+            this.map[(int)size.X-1, (int)size.Y-1, 1] = GameObjectFactory.CreateGameObject(GameObjectType.UNIT_CAR, new Vector3(size.X, size.Y, 1));
         }
         public GameObject getTileAtPosition(Vector3 position)
         {

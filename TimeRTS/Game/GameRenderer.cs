@@ -15,7 +15,9 @@ namespace TimeRTS.Game
         private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
         public static Dictionary<String, GameObjectTexture> textures = new Dictionary<string, GameObjectTexture>();
         public static void Initialize() {
+            textures.Add("CarUnit", new GameObjectTexture("Images/CarUnit"));
             textures.Add("GrassTile", new GameObjectTexture("Images/GrassTile"));
+            textures.Add("StoneTile", new GameObjectTexture("Images/StoneTile"));
         }
         /// <summary>
         /// Renders the current game onto the screen. 
@@ -87,6 +89,9 @@ namespace TimeRTS.Game
         private static GameObject[, ,] rotateMapArray(GameObject[, ,] map, int clockwiseQuarterRotations) {
             GameObject[,,] transposedMap = new GameObject[map.GetLength(1), map.GetLength(0), map.GetLength(2)];
             int clockwiseRotations = clockwiseQuarterRotations % 4;
+            if(clockwiseRotations == 0) {
+                return map;
+            }
             //Transpose. Linear algebra is so cool. 
             for(int x = 0; x<map.GetLength(0); x++) {
                 for(int y = 0; y<map.GetLength(1); y++) {
@@ -96,7 +101,7 @@ namespace TimeRTS.Game
                 }
             }
             GameObject[,,] newMap = new GameObject[map.GetLength(1), map.GetLength(0), map.GetLength(2)];
-            //Reverse rows if going clockwise, columns if counter-clockwise, nothing if a full 180.  
+            //Reverse rows if going clockwise, columns if counter-clockwise, both if a full 180.  
             for (int x = 0; x < transposedMap.GetLength(0); x++) {
                 for (int y = 0; y < transposedMap.GetLength(1); y++) {
                     for (int z = 0; z < transposedMap.GetLength(2); z++) {
@@ -105,7 +110,8 @@ namespace TimeRTS.Game
                                 newMap[x, transposedMap.GetLength(1) - y - 1, z] = transposedMap[x, y, z];
                                 break;
                             case 2:
-                                return transposedMap;
+                                newMap[transposedMap.GetLength(0) - x - 1, transposedMap.GetLength(1) - y - 1, z] = transposedMap[x, y, z];
+                                break;
                             case 3:
                                 newMap[transposedMap.GetLength(0) - x - 1, y, z] = transposedMap[x, y, z];
                                 break;
@@ -132,7 +138,7 @@ namespace TimeRTS.Game
         /// <param name="spriteBatch">The spritebatch to render onto.</param>
         /// <param name="map">The map that we are rendering from.</param>
         private static void renderColumn(Vector2 position, SpriteBatch spriteBatch, MapState map) {
-            for (int z = (int) map.getSize().Z - 1; z >= 0; z--) {
+            for (int z = 0; z < map.getSize().Z; z++) {
                 Vector3 currentPosition = new Vector3(position.X, position.Y, z);
                 GameObject currentTile = map.getTileAtPosition(currentPosition);
                 if (currentTile == null) {
@@ -149,8 +155,8 @@ namespace TimeRTS.Game
         /// <param name="point">The isometric point</param>
         /// <returns>The equivalent screen coordinates</returns>
         private static Vector2 isometricToScreen(Vector3 point) {
-            int isoX = (int) (point.X + point.Z);
-            int isoY = (int) (point.Y + point.Z);
+            int isoX = (int) (point.X - point.Z);
+            int isoY = (int) (point.Y - point.Z);
             float screenX = (isoX - isoY) * TILE_WIDTH / 2;
             float screenY = (isoY + isoX) * (TILE_HEIGHT / 4);
             return new Vector2(screenX + (GameState.WINDOW_WIDTH/2), screenY);
