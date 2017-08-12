@@ -11,8 +11,8 @@ namespace TimeRTS.Game {
         private const int TILE_CONTENT_HEIGHT = 1024; //Each cube is this tall in the given content. 
         public IsometricGraphicsComponent(string textureName) : base(textureName) {
         }
-        public override RenderData GetRenderData() {
-            Rectangle sourceRect = new Rectangle(0, ((int) GameRenderer.GetCameraDirection()) * TILE_CONTENT_HEIGHT, TILE_CONTENT_WIDTH, TILE_CONTENT_HEIGHT);
+        public override RenderData GetRenderData(GameObject obj) {
+            Rectangle sourceRect = new Rectangle(0, (((int) GameRenderer.GetDirection() + (int) obj.direction) % 4) * TILE_CONTENT_HEIGHT, TILE_CONTENT_WIDTH, TILE_CONTENT_HEIGHT);
             return new RenderData(this.texture, sourceRect);
         }
     }

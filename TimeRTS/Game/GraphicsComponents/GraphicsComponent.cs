@@ -15,7 +15,7 @@ namespace TimeRTS.Game {
             this.textureName = textureName;
             this.texture = GameRenderer.textures[this.textureName].spriteSheet;
         }
-        public virtual RenderData GetRenderData() {
+        public virtual RenderData GetRenderData(GameObject obj) {
             return new RenderData(this.texture);
         }
     }

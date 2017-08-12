@@ -15,16 +15,22 @@ namespace TimeRTS.Game
     class GameObject
     {
         public Vector3 position;
-        public int direction;
+        public Direction direction;
 
         private TurnComponent turn;
         private GraphicsComponent graphics;
-        public GameObject(Vector3 position, GraphicsComponent graphics)  {
+        public GameObject(Vector3 position, GraphicsComponent graphics, Direction? direction = Direction.NORTHEAST)  {
             this.position = position;
             this.graphics = graphics;
+            if (direction.HasValue) {
+                this.direction = direction.Value;
+            }
+            else {
+                this.direction = Direction.NORTHEAST;
+            }
         }
         public RenderData GetRenderData() {
-            return this.graphics.GetRenderData();
+            return this.graphics.GetRenderData(this);
         }
     }
 }

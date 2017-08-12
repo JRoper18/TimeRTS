@@ -13,16 +13,16 @@ namespace TimeRTS.Game {
         UNIT_CAR
     }
     static class GameObjectFactory {
-        public static GameObject CreateGameObject(GameObjectType type, Vector3 position) {
+        public static GameObject CreateGameObject(GameObjectType type, Vector3 position, Direction? direction = null) {
             switch (type) {
                 case GameObjectType.TILE_GRASS:
                     return new GameObject(position, new IsometricGraphicsComponent("GrassTile"));
                 case GameObjectType.TILE_STAIR_GRASS:
-                    return new GameObject(position, new IsometricGraphicsComponent("GrassTileStair"));
+                    return new GameObject(position, new IsometricGraphicsComponent("GrassTileStair"), direction);
                 case GameObjectType.TILE_STONE:
                     return new GameObject(position, new IsometricGraphicsComponent("StoneTile"));
                 case GameObjectType.UNIT_CAR:
-                    return new GameObject(position, new IsometricGraphicsComponent("CarUnit"));
+                    return new GameObject(position, new IsometricGraphicsComponent("CarUnit"), direction);
                 default:
                     return new GameObject(position, new IsometricGraphicsComponent("GrassTile"));
             }

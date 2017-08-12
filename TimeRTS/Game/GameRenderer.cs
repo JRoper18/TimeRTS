@@ -9,17 +9,11 @@ using System.Threading.Tasks;
 
 namespace TimeRTS.Game
 {
-    enum CameraDirection {
-        NORTHEAST,
-        SOUTHEAST,
-        SOUTHWEST,
-        NORTHWEST
-    }
     static class GameRenderer
     {
         private const int TILE_HEIGHT = 110;
         private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
-        private static CameraDirection cameraDirection = CameraDirection.NORTHEAST;
+        private static Direction cameraDirection = Direction.NORTHEAST;
         /*
          * Camera directions work like this:
          *           Y  /     --       \  X   
@@ -51,8 +45,8 @@ namespace TimeRTS.Game
             }
             MapState map = mapState;
             Vector3 size = map.getSize();
-            bool increasingX = (cameraDirection == CameraDirection.NORTHEAST || cameraDirection == CameraDirection.NORTHWEST);
-            bool increasingY = (cameraDirection  == CameraDirection.NORTHEAST || cameraDirection == CameraDirection.SOUTHEAST);
+            bool increasingX = (cameraDirection == Direction.NORTHEAST || cameraDirection== Direction.NORTHWEST);
+            bool increasingY = (cameraDirection == Direction.NORTHEAST || cameraDirection== Direction.SOUTHEAST);
             bool yIsColumn = (increasingY != increasingX);
             int currentX = (increasingX) ? 0 : (int) size.X - 1;
             int currentY = (increasingY) ? 0 : (int) size.Y - 1;
@@ -103,15 +97,15 @@ namespace TimeRTS.Game
             Vector2 translated = point - center;
             Vector2 rotated = point;
             switch (cameraDirection) {
-                case CameraDirection.NORTHEAST:
+                case Direction.NORTHEAST:
                     return point;
-                case CameraDirection.SOUTHEAST:
+                case Direction.SOUTHEAST:
                     rotated = new Vector2(translated.Y, -translated.X);
                     break;
-                case CameraDirection.SOUTHWEST:
-                    rotated = new Vector2(-translated.Y, -translated.X);
+                case Direction.SOUTHWEST:
+                    rotated = new Vector2(-translated.X, -translated.Y);
                     break;
-                case CameraDirection.NORTHWEST:
+                case Direction.NORTHWEST:
                     rotated = new Vector2(-translated.Y, translated.X);
                     break;
             }
@@ -157,27 +151,28 @@ namespace TimeRTS.Game
             return new Vector2(screenX + (GameState.WINDOW_WIDTH / 2), screenY + 100);
         }
         public static void RotateCameraCounterClockwise() {
-            if (cameraDirection == CameraDirection.NORTHWEST) {
-                cameraDirection = CameraDirection.NORTHEAST;
+            if (cameraDirection== Direction.NORTHWEST) {
+                cameraDirection= Direction.NORTHEAST;
             }
             else {
                 cameraDirection++;
             }
+            Debug.WriteLine(cameraDirection);
 
         }
         public static void RotateCameraClockwise() {
-            if (cameraDirection == CameraDirection.NORTHEAST) {
-                cameraDirection = CameraDirection.NORTHWEST;
+            if (cameraDirection== Direction.NORTHEAST) {
+                cameraDirection= Direction.NORTHWEST;
             }
             else {
                 cameraDirection--;
             }
         }
-        public static CameraDirection GetCameraDirection() {
+        public static Direction GetDirection() {
             return cameraDirection;
         }
-        public static Vector3 GetCameraDirectionUnitVector() {
-            switch ((int) GameRenderer.GetCameraDirection()) {
+        public static Vector3 GetDirectionUnitVector() {
+            switch ((int) GameRenderer.GetDirection()) {
                 case 0:
                     return new Vector3(0, -1, 0);
                 case 1:

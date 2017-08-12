@@ -44,6 +44,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
+    <Compile Include="Game\DirectionUtils.cs" />
     <Compile Include="Game\GameObject.cs" />
     <Compile Include="Game\GameObjectFactory.cs" />
     <Compile Include="Game\GameObjectTexture.cs" />

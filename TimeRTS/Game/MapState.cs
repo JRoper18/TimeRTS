@@ -20,13 +20,16 @@ namespace TimeRTS.Game
             {
                 for(int y = 0; y<size.Y; y++)
                 {
-                    if(x + y == 5) {
-                        this.map[x, y, 1] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_STAIR_GRASS, new Vector3(x, y, 1));
+                    if(x == 0) {
+                        this.map[x, y, 1] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_STAIR_GRASS, new Vector3(x, y, 1), Direction.NORTHWEST);
+                    }
+                    if(x == 7) {
+                        this.map[x, y, 1] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_STAIR_GRASS, new Vector3(x, y, 1), Direction.SOUTHEAST);
                     }
                     this.map[x, y, 0] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_GRASS, new Vector3(x, y, 0));
                 }
             }
-            this.map[(int)size.X-1, (int)size.Y-1, 1] = GameObjectFactory.CreateGameObject(GameObjectType.UNIT_CAR, new Vector3(size.X, size.Y, 1));
+            this.map[4, 4, 1] = GameObjectFactory.CreateGameObject(GameObjectType.UNIT_CAR, new Vector3(4, 4, 1));
         }
         public GameObject getTileAtPosition(Vector3 position)
         {
