@@ -20,6 +20,9 @@ namespace TimeRTS.Game
             {
                 for(int y = 0; y<size.Y; y++)
                 {
+                    if(x + y == 5) {
+                        this.map[x, y, 1] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_STAIR_GRASS, new Vector3(x, y, 1));
+                    }
                     this.map[x, y, 0] = GameObjectFactory.CreateGameObject(GameObjectType.TILE_GRASS, new Vector3(x, y, 0));
                 }
             }
@@ -35,6 +38,13 @@ namespace TimeRTS.Game
         public Vector3 getSize()
         {
             return new Vector3(map.GetLength(0), map.GetLength(1), map.GetLength(2));
+        }
+        public void clearPosition(Vector3 position) {
+            this.map[(int)position.X, (int)position.Y, (int)position.Z] = null;
+        }
+        public void moveGameObject(Vector3 oldPosition, Vector3 newPosition) {
+            this.map[(int) newPosition.X, (int) newPosition.Y, (int) newPosition.Z] = this.getTileAtPosition(oldPosition);
+            this.clearPosition(oldPosition);
         }
     }
 }

@@ -54,6 +54,8 @@
     <Compile Include="Game\InputHandler.cs" />
     <Compile Include="Game\MapState.cs" />
     <Compile Include="Game\RenderData.cs" />
+    <Compile Include="Game\TurnComponents\MoveForwardTurnComponent.cs" />
+    <Compile Include="Game\TurnComponents\TurnComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

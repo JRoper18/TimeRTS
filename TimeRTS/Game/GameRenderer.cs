@@ -13,11 +13,21 @@ namespace TimeRTS.Game
     {
         private const int TILE_HEIGHT = 110;
         private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
+        private static int cameraDirection = 1;
+        /*
+         * Camera directions work like this:
+         *           Y  /     --       \  X   
+         *             /  3  ----  0    \
+         *            \/    ------      \/
+         *                2  ----  1
+         *                    --
+         */
         public static Dictionary<String, GameObjectTexture> textures = new Dictionary<string, GameObjectTexture>();
         public static void Initialize() {
             textures.Add("CarUnit", new GameObjectTexture("Images/CarUnit"));
             textures.Add("GrassTile", new GameObjectTexture("Images/GrassTile"));
             textures.Add("StoneTile", new GameObjectTexture("Images/StoneTile"));
+            textures.Add("GrassTileStair", new GameObjectTexture("Images/GrassTileStair"));
         }
         /// <summary>
         /// Renders the current game onto the screen. 
@@ -28,100 +38,80 @@ namespace TimeRTS.Game
             spriteBatch.Begin();
             MapState mapState = state.getMapAtTime(0);
             if (InputHandler.WasPressed(Microsoft.Xna.Framework.Input.Keys.E)) {
-                GraphicsComponent.RotateClockwise();
+                RotateCameraClockwise();
             }
             else if (InputHandler.WasPressed(Microsoft.Xna.Framework.Input.Keys.Q)) {
-                GraphicsComponent.RotateCounterClockwise();
+                RotateCameraCounterClockwise();
             }
-            GameObject[,,] mapArray = rotateMapArray(mapState.getMapClone(), GraphicsComponent.GetCameraDirection());
-            MapState map = new MapState(mapArray);
+            MapState map = mapState;
             Vector3 size = map.getSize();
-            int rows = (int)(size.X + size.Y-1);
-            for(int i = 0; i<Math.Min(size.X, size.Y); i++) {
-                for(int j = 0; j<=i; j++) {
-                    int posX = j;
-                    int posY = i - j;
-                    renderColumn(new Vector2(posX, posY), spriteBatch, map);
-                }
-            }
-            bool isXShortestDimension = (size.X < size.Y);
-            int numberOfSameLengthRows = (int) Math.Abs(size.X - size.Y);
-            if (isXShortestDimension) {
-                for (int i = 0; i < numberOfSameLengthRows; i++) {
-                    for (int j = 0; j < size.X; j++) {
-                        int posX = j;
-                        int posY = i - j + (int) size.X;
-                        renderColumn(new Vector2(posX, posY), spriteBatch, map);
+            bool increasingX = (cameraDirection == 0 || cameraDirection == 3);
+            bool increasingY = (cameraDirection < 2);
+            bool yIsColumn = (increasingY != increasingX);
+            int currentX = (increasingX) ? 0 : (int) size.X - 1;
+            int currentY = (increasingY) ? 0 : (int) size.Y - 1;
+            Debug.WriteLine(increasingX + " " + increasingX);
+            while ((yIsColumn) ? ((increasingY) ? currentY < size.Y : currentY >= 0) : ((increasingX) ? currentX < size.X : currentX >= 0)) {
+                while ((yIsColumn) ? ((increasingX) ? currentX < size.X : currentX >= 0) : ((increasingY) ? currentY < size.Y : currentY >= 0)) {
+                    renderColumn(new Vector2(currentX, currentY), spriteBatch, map);
+                    Debug.WriteLine(currentX + " " + currentY);
+                    if (!yIsColumn) {
+                        if (increasingY) {
+                            currentY++;
+                        }
+                        else {
+                            currentY--;
+                        }
+                    }
+                    else {
+                        if (increasingX) {
+                            currentX++;
+                        }
+                        else {
+                            currentX--;
+                        }
                     }
                 }
-                for (int i = 0; i < size.X - 1; i++) {
-                    for (int j = 0; j < size.X - i - 1; j++) {
-                        int posY = numberOfSameLengthRows + 1 + i + j;
-                        int posX = (int)size.X - j - 1;
-                        renderColumn(new Vector2(posX, posY), spriteBatch, map);
+                if (yIsColumn) {
+                    if (increasingY) {
+                        currentY++;
                     }
+                    else {
+                        currentY--;
+                    }
+                    currentX = (increasingX) ? 0 : (int)size.X - 1;
                 }
-            }
-            else {
-                for (int i = 0; i < numberOfSameLengthRows; i++) {
-                    for (int j = 0; j < size.Y; j++) {
-                        int posX = i + j + 1;
-                        int posY = (int) size.Y - 1 - j;
-                        renderColumn(new Vector2(posX, posY), spriteBatch, map);
+                else {
+                    if (increasingX) {
+                        currentX++;
                     }
-                }
-                for(int i = 0; i<size.Y - 1; i++) {
-                    for(int j = 0; j < size.Y - i - 1; j++) {
-                        int posX = numberOfSameLengthRows + 1 + i + j;
-                        int posY = (int) size.Y - j - 1;
-                        renderColumn(new Vector2(posX, posY), spriteBatch, map);
+                    else {
+                        currentX--;
                     }
+                    currentY = (increasingY) ? 0 : (int)size.Y - 1;
                 }
             }
             spriteBatch.End();
         }
-        /// <summary>
-        /// Takes a map array and rotates the array by however many 90-degree segments clockwise specified. 
-        /// </summary>
-        /// <param name="map">The map to rotate</param>
-        /// <param name="clockwiseQuarterRotations">The amount of 90-degree clockwise rotations. </param>
-        /// <returns>The rotated map. </returns>
-        private static GameObject[, ,] rotateMapArray(GameObject[, ,] map, int clockwiseQuarterRotations) {
-            GameObject[,,] transposedMap = new GameObject[map.GetLength(1), map.GetLength(0), map.GetLength(2)];
-            int clockwiseRotations = clockwiseQuarterRotations % 4;
-            if(clockwiseRotations == 0) {
-                return map;
+
+        private static Vector2 rotatePoint(Vector2 point, Vector3 mapSize) {
+            Vector2 center = new Vector2((mapSize.X-1)/2, (mapSize.Y-1)/2);
+            Vector2 translated = point - center;
+            Vector2 rotated = point;
+            switch (cameraDirection) {
+                case 0:
+                    return point;
+                case 1:
+                    rotated = new Vector2(translated.Y, -translated.X);
+                    break;
+                case 2:
+                    rotated = new Vector2(-translated.Y, -translated.X);
+                    break;
+                case 3:
+                    rotated = new Vector2(-translated.Y, translated.X);
+                    break;
             }
-            //Transpose. Linear algebra is so cool. 
-            for(int x = 0; x<map.GetLength(0); x++) {
-                for(int y = 0; y<map.GetLength(1); y++) {
-                    for(int z = 0; z<map.GetLength(2); z++) {
-                        transposedMap[y, x, z] = map[x, y, z];
-                    }
-                }
-            }
-            GameObject[,,] newMap = new GameObject[map.GetLength(1), map.GetLength(0), map.GetLength(2)];
-            //Reverse rows if going clockwise, columns if counter-clockwise, both if a full 180.  
-            for (int x = 0; x < transposedMap.GetLength(0); x++) {
-                for (int y = 0; y < transposedMap.GetLength(1); y++) {
-                    for (int z = 0; z < transposedMap.GetLength(2); z++) {
-                        switch (clockwiseRotations) {
-                            case 1:
-                                newMap[x, transposedMap.GetLength(1) - y - 1, z] = transposedMap[x, y, z];
-                                break;
-                            case 2:
-                                newMap[transposedMap.GetLength(0) - x - 1, transposedMap.GetLength(1) - y - 1, z] = transposedMap[x, y, z];
-                                break;
-                            case 3:
-                                newMap[transposedMap.GetLength(0) - x - 1, y, z] = transposedMap[x, y, z];
-                                break;
-                            default:
-                                return map;
-                        }
-                    }
-                }
-            }
-            return newMap;
+            return rotated + center;
         }
         /// <summary>
         /// Loads all game content and textures.
@@ -138,9 +128,10 @@ namespace TimeRTS.Game
         /// <param name="spriteBatch">The spritebatch to render onto.</param>
         /// <param name="map">The map that we are rendering from.</param>
         private static void renderColumn(Vector2 position, SpriteBatch spriteBatch, MapState map) {
+            Vector2 rotated = rotatePoint(position, map.getSize());
             for (int z = 0; z < map.getSize().Z; z++) {
-                Vector3 currentPosition = new Vector3(position.X, position.Y, z);
-                GameObject currentTile = map.getTileAtPosition(currentPosition);
+                Vector3 currentPosition = new Vector3(rotated.X, rotated.Y, z);
+                GameObject currentTile = map.getTileAtPosition(new Vector3(position.X, position.Y, z));
                 if (currentTile == null) {
                     continue;
                 }
@@ -159,7 +150,42 @@ namespace TimeRTS.Game
             int isoY = (int) (point.Y - point.Z);
             float screenX = (isoX - isoY) * TILE_WIDTH / 2;
             float screenY = (isoY + isoX) * (TILE_HEIGHT / 4);
-            return new Vector2(screenX + (GameState.WINDOW_WIDTH/2), screenY);
+            return new Vector2(screenX + (GameState.WINDOW_WIDTH/2), screenY + 100);
+        }
+        public static void RotateCameraClockwise() {
+            if (cameraDirection == 3) {
+                cameraDirection = 0;
+            }
+            else {
+                cameraDirection++;
+            }
+            Debug.WriteLine(cameraDirection);
+        }
+        public static void RotateCameraCounterClockwise() {
+            if (cameraDirection == 0) {
+                cameraDirection = 3;
+            }
+            else {
+                cameraDirection--;
+            }
+            Debug.WriteLine(cameraDirection);
+        }
+        public static int GetCameraDirection() {
+            return cameraDirection;
+        }
+        public static Vector3 GetCameraDirectionUnitVector() {
+            switch (GameRenderer.GetCameraDirection()) {
+                case 0:
+                    return new Vector3(0, -1, 0);
+                case 1:
+                    return new Vector3(1, 0, 0);
+                case 2:
+                    return new Vector3(0, 1, 0);
+                case 3:
+                    return new Vector3(-1, 0, 0);
+                default:
+                    return new Vector3(0, 0, 0);
+            }
         }
     }
 }

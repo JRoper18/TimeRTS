@@ -5,15 +5,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TimeRTS.Game.TurnComponents;
 
 namespace TimeRTS.Game
 {
     /// <summary>
-    /// A GameObject is something that is rendered onto the screen that is in the world (so not UI). 
+    /// A generic container for all objects in-game. 
     /// </summary>
     class GameObject
     {
         public Vector3 position;
+        public int direction;
+
+        private TurnComponent turn;
         private GraphicsComponent graphics;
         public GameObject(Vector3 position, GraphicsComponent graphics)  {
             this.position = position;
