@@ -9,17 +9,23 @@ using System.Threading.Tasks;
 
 namespace TimeRTS.Game
 {
+    enum CameraDirection {
+        NORTHEAST,
+        SOUTHEAST,
+        SOUTHWEST,
+        NORTHWEST
+    }
     static class GameRenderer
     {
         private const int TILE_HEIGHT = 110;
         private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
-        private static int cameraDirection = 1;
+        private static CameraDirection cameraDirection = CameraDirection.NORTHEAST;
         /*
          * Camera directions work like this:
          *           Y  /     --       \  X   
-         *             /  3  ----  0    \
+         *             /  NW ----  NE   \
          *            \/    ------      \/
-         *                2  ----  1
+         *                SW ----  SE
          *                    --
          */
         public static Dictionary<String, GameObjectTexture> textures = new Dictionary<string, GameObjectTexture>();
@@ -45,16 +51,14 @@ namespace TimeRTS.Game
             }
             MapState map = mapState;
             Vector3 size = map.getSize();
-            bool increasingX = (cameraDirection == 0 || cameraDirection == 3);
-            bool increasingY = (cameraDirection < 2);
+            bool increasingX = (cameraDirection == CameraDirection.NORTHEAST || cameraDirection == CameraDirection.NORTHWEST);
+            bool increasingY = (cameraDirection  == CameraDirection.NORTHEAST || cameraDirection == CameraDirection.SOUTHEAST);
             bool yIsColumn = (increasingY != increasingX);
             int currentX = (increasingX) ? 0 : (int) size.X - 1;
             int currentY = (increasingY) ? 0 : (int) size.Y - 1;
-            Debug.WriteLine(increasingX + " " + increasingX);
             while ((yIsColumn) ? ((increasingY) ? currentY < size.Y : currentY >= 0) : ((increasingX) ? currentX < size.X : currentX >= 0)) {
                 while ((yIsColumn) ? ((increasingX) ? currentX < size.X : currentX >= 0) : ((increasingY) ? currentY < size.Y : currentY >= 0)) {
                     renderColumn(new Vector2(currentX, currentY), spriteBatch, map);
-                    Debug.WriteLine(currentX + " " + currentY);
                     if (!yIsColumn) {
                         if (increasingY) {
                             currentY++;
@@ -99,15 +103,15 @@ namespace TimeRTS.Game
             Vector2 translated = point - center;
             Vector2 rotated = point;
             switch (cameraDirection) {
-                case 0:
+                case CameraDirection.NORTHEAST:
                     return point;
-                case 1:
+                case CameraDirection.SOUTHEAST:
                     rotated = new Vector2(translated.Y, -translated.X);
                     break;
-                case 2:
+                case CameraDirection.SOUTHWEST:
                     rotated = new Vector2(-translated.Y, -translated.X);
                     break;
-                case 3:
+                case CameraDirection.NORTHWEST:
                     rotated = new Vector2(-translated.Y, translated.X);
                     break;
             }
@@ -146,35 +150,34 @@ namespace TimeRTS.Game
         /// <param name="point">The isometric point</param>
         /// <returns>The equivalent screen coordinates</returns>
         private static Vector2 isometricToScreen(Vector3 point) {
-            int isoX = (int) (point.X - point.Z);
-            int isoY = (int) (point.Y - point.Z);
+            int isoX = (int)(point.X - point.Z);
+            int isoY = (int)(point.Y - point.Z);
             float screenX = (isoX - isoY) * TILE_WIDTH / 2;
             float screenY = (isoY + isoX) * (TILE_HEIGHT / 4);
-            return new Vector2(screenX + (GameState.WINDOW_WIDTH/2), screenY + 100);
+            return new Vector2(screenX + (GameState.WINDOW_WIDTH / 2), screenY + 100);
         }
-        public static void RotateCameraClockwise() {
-            if (cameraDirection == 3) {
-                cameraDirection = 0;
+        public static void RotateCameraCounterClockwise() {
+            if (cameraDirection == CameraDirection.NORTHWEST) {
+                cameraDirection = CameraDirection.NORTHEAST;
             }
             else {
                 cameraDirection++;
             }
-            Debug.WriteLine(cameraDirection);
+
         }
-        public static void RotateCameraCounterClockwise() {
-            if (cameraDirection == 0) {
-                cameraDirection = 3;
+        public static void RotateCameraClockwise() {
+            if (cameraDirection == CameraDirection.NORTHEAST) {
+                cameraDirection = CameraDirection.NORTHWEST;
             }
             else {
                 cameraDirection--;
             }
-            Debug.WriteLine(cameraDirection);
         }
-        public static int GetCameraDirection() {
+        public static CameraDirection GetCameraDirection() {
             return cameraDirection;
         }
         public static Vector3 GetCameraDirectionUnitVector() {
-            switch (GameRenderer.GetCameraDirection()) {
+            switch ((int) GameRenderer.GetCameraDirection()) {
                 case 0:
                     return new Vector3(0, -1, 0);
                 case 1:
