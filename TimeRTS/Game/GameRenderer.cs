@@ -13,6 +13,8 @@ namespace TimeRTS.Game
     {
         private const int TILE_HEIGHT = 110;
         private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
+        public static float scale = 1;
+        public static Vector2 cameraOffset = new Vector2((GameState.WINDOW_WIDTH / 2), 100);
         private static Direction cameraDirection = Direction.NORTHEAST;
         /*
          * Camera directions work like this:
@@ -129,7 +131,7 @@ namespace TimeRTS.Game
                 }
                 RenderData currentRenderData = currentTile.GetRenderData();
                 Vector2 screenPosition = isometricToScreen(currentPosition);
-                spriteBatch.Draw(currentRenderData.texture, new Rectangle((int) screenPosition.X, (int) screenPosition.Y, TILE_WIDTH, TILE_HEIGHT), currentRenderData.sourceRectangle, Color.White);
+                spriteBatch.Draw(currentRenderData.texture, new Rectangle((int) screenPosition.X, (int) screenPosition.Y, (int) ((float) TILE_WIDTH * scale), (int)((float)TILE_HEIGHT * scale)), currentRenderData.sourceRectangle, Color.White);
             }
         }
         /// <summary>
@@ -140,9 +142,9 @@ namespace TimeRTS.Game
         private static Vector2 isometricToScreen(Vector3 point) {
             int isoX = (int)(point.X - point.Z);
             int isoY = (int)(point.Y - point.Z);
-            float screenX = (isoX - isoY) * TILE_WIDTH / 2;
-            float screenY = (isoY + isoX) * (TILE_HEIGHT / 4);
-            return new Vector2(screenX + (GameState.WINDOW_WIDTH / 2), screenY + 100);
+            float screenX = scale * ((isoX - isoY) * TILE_WIDTH / 2);
+            float screenY = scale * ((isoY + isoX) * (TILE_HEIGHT / 4));
+            return new Vector2(screenX + cameraOffset.X, screenY + cameraOffset.Y);
         }
         public static void RotateCameraCounterClockwise() {
             if (cameraDirection== Direction.NORTHWEST) {
@@ -151,7 +153,6 @@ namespace TimeRTS.Game
             else {
                 cameraDirection++;
             }
-            Debug.WriteLine(cameraDirection);
 
         }
         public static void RotateCameraClockwise() {
