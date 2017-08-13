@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TimeRTS.Game.TurnComponents;
 
 namespace TimeRTS.Game {
     enum GameObjectType {
@@ -16,15 +17,15 @@ namespace TimeRTS.Game {
         public static GameObject CreateGameObject(GameObjectType type, Vector3 position, Direction? direction = null) {
             switch (type) {
                 case GameObjectType.TILE_GRASS:
-                    return new GameObject(position, new IsometricGraphicsComponent("GrassTile"));
+                    return new GameObject(new IsometricGraphicsComponent("GrassTile"), new TurnComponent(), position);
                 case GameObjectType.TILE_STAIR_GRASS:
-                    return new GameObject(position, new IsometricGraphicsComponent("GrassTileStair"), direction);
+                    return new GameObject(new IsometricGraphicsComponent("GrassTileStair"), new TurnComponent(), position, direction);
                 case GameObjectType.TILE_STONE:
-                    return new GameObject(position, new IsometricGraphicsComponent("StoneTile"));
+                    return new GameObject(new IsometricGraphicsComponent("StoneTile"), new TurnComponent(), position);
                 case GameObjectType.UNIT_CAR:
-                    return new GameObject(position, new IsometricGraphicsComponent("CarUnit"), direction);
+                    return new GameObject(new IsometricGraphicsComponent("CarUnit"), new MoveForwardTurnComponent(), position, direction);
                 default:
-                    return new GameObject(position, new IsometricGraphicsComponent("GrassTile"));
+                    return new GameObject(new IsometricGraphicsComponent("GrassTile"), new TurnComponent(), position);
             }
         }
     }

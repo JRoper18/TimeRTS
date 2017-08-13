@@ -36,13 +36,7 @@ namespace TimeRTS.Game
         /// <param name="spriteBatch">The spritebatch we are using to draw.</param>
         public static void Render(GameState state, SpriteBatch spriteBatch) {
             spriteBatch.Begin();
-            MapState mapState = state.getMapAtTime(0);
-            if (InputHandler.WasPressed(Microsoft.Xna.Framework.Input.Keys.E)) {
-                RotateCameraClockwise();
-            }
-            else if (InputHandler.WasPressed(Microsoft.Xna.Framework.Input.Keys.Q)) {
-                RotateCameraCounterClockwise();
-            }
+            MapState mapState = state.GetCurrentViewedMap();
             MapState map = mapState;
             Vector3 size = map.getSize();
             bool increasingX = (cameraDirection == Direction.NORTHEAST || cameraDirection== Direction.NORTHWEST);

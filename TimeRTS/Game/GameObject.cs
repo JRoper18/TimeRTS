@@ -19,15 +19,24 @@ namespace TimeRTS.Game
 
         private TurnComponent turn;
         private GraphicsComponent graphics;
-        public GameObject(Vector3 position, GraphicsComponent graphics, Direction? direction = Direction.NORTHEAST)  {
-            this.position = position;
+        public GameObject(GraphicsComponent graphics, TurnComponent turn, Vector3? position, Direction? direction = Direction.NORTHEAST)  {
             this.graphics = graphics;
+            this.turn = turn;
+            if (position.HasValue) {
+                this.position = position.Value;
+            }
+            else {
+                this.position = new Vector3(0, 0, 0);
+            }
             if (direction.HasValue) {
                 this.direction = direction.Value;
             }
             else {
                 this.direction = Direction.NORTHEAST;
             }
+        }
+        public void doTurn(MapState map) {
+            this.turn.doTurn(this, map);
         }
         public RenderData GetRenderData() {
             return this.graphics.GetRenderData(this);

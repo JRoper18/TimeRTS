@@ -50,6 +50,7 @@ namespace TimeRTS
 
             // TODO: use this.Content to load your game content here
             GameRenderer.LoadAllContent();
+            GameState.Instance.SimulateTurns();
         }
 
         /// <summary>
@@ -73,6 +74,7 @@ namespace TimeRTS
 
             // TODO: Add your update logic here
             InputHandler.UpdateKeyboardState();
+            GameState.Instance.Update(gameTime);
             base.Update(gameTime);
         }
 

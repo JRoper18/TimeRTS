@@ -12,8 +12,12 @@ namespace TimeRTS.Game.TurnComponents {
         }
         public override void doTurn(GameObject obj, MapState map) {
             Vector3 newPos = obj.position + DirectionUtils.GetDirectionUnitVector(obj.direction);
-            if (map.getTileAtPosition(obj.position + DirectionUtils.GetDirectionUnitVector(obj.direction)) == null) {
-                map.moveGameObject(obj.position, newPos);
+            try {
+                if (map.getTileAtPosition(obj.position + DirectionUtils.GetDirectionUnitVector(obj.direction)) == null) {
+                    obj.position = newPos;
+                }
+            } catch (IndexOutOfRangeException ex) {
+                //Nothing
             }
         }
     }

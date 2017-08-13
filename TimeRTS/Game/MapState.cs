@@ -7,9 +7,16 @@ using System.Threading.Tasks;
 
 namespace TimeRTS.Game
 {
+    /// <summary>
+    /// The map at on a single turn. The map should NOT be able to be edited publicly. GameObjects can edit own their position, which will update in the GameState. 
+    /// </summary>
     class MapState
     {
         private GameObject[, ,] map;
+        /// <summary>
+        /// The map at on a single turn. The map should NOT be able to be edited publicly. GameObjects can edit own their position, which will update in the GameState. 
+        /// </summary>
+        /// <param name="mapArray">An array of GameObjects to use. </param>
         public MapState(GameObject[,,] mapArray) {
             this.map = mapArray;
         }
@@ -33,7 +40,7 @@ namespace TimeRTS.Game
         }
         public GameObject getTileAtPosition(Vector3 position)
         {
-            return map[(int)position.X,(int)position.Y, (int)position.Z];
+           return map[(int)position.X,(int)position.Y, (int)position.Z];
         }
         public GameObject[, ,] getMapClone() {
             return (GameObject[, ,]) this.map.Clone();
@@ -42,10 +49,10 @@ namespace TimeRTS.Game
         {
             return new Vector3(map.GetLength(0), map.GetLength(1), map.GetLength(2));
         }
-        public void clearPosition(Vector3 position) {
+        private void clearPosition(Vector3 position) {
             this.map[(int)position.X, (int)position.Y, (int)position.Z] = null;
         }
-        public void moveGameObject(Vector3 oldPosition, Vector3 newPosition) {
+        private void moveGameObject(Vector3 oldPosition, Vector3 newPosition) {
             this.map[(int) newPosition.X, (int) newPosition.Y, (int) newPosition.Z] = this.getTileAtPosition(oldPosition);
             this.clearPosition(oldPosition);
         }
