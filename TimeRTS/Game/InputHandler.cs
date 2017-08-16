@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,12 @@ namespace TimeRTS.Game {
         }
         public static float ScrollDifference() {
             return currentMouseState.ScrollWheelValue - previousMouseState.ScrollWheelValue;
+        }
+        public static Point MousePosition() {
+            return currentMouseState.Position;
+        }
+        public static bool IsMouseDown() {
+            return currentMouseState.LeftButton == ButtonState.Pressed;
         }
     }
 }

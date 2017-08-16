@@ -49,10 +49,10 @@ namespace TimeRTS.Game
         {
             return new Vector3(map.GetLength(0), map.GetLength(1), map.GetLength(2));
         }
-        private void clearPosition(Vector3 position) {
+        public void clearPosition(Vector3 position) {
             this.map[(int)position.X, (int)position.Y, (int)position.Z] = null;
         }
-        private void moveGameObject(Vector3 oldPosition, Vector3 newPosition) {
+        public void moveGameObject(Vector3 oldPosition, Vector3 newPosition) {
             this.map[(int) newPosition.X, (int) newPosition.Y, (int) newPosition.Z] = this.getTileAtPosition(oldPosition);
             this.clearPosition(oldPosition);
         }

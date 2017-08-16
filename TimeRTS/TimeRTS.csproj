@@ -44,6 +44,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
+    <Compile Include="Game\Commands\Command.cs" />
+    <Compile Include="Game\Commands\MoveForwardCommand.cs" />
     <Compile Include="Game\DirectionUtils.cs" />
     <Compile Include="Game\GameObject.cs" />
     <Compile Include="Game\GameObjectFactory.cs" />

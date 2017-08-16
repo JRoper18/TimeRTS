@@ -19,7 +19,7 @@ namespace TimeRTS.Game
         private MapState[] mapsOverTime = new MapState[MAX_TURNS];
         public const int WINDOW_HEIGHT = 900;
         public const int WINDOW_WIDTH = 1600;
-        public static readonly Vector3 mapSize = new Vector3(100, 100, 2);
+        public static readonly Vector3 mapSize = new Vector3(10, 10, 2);
         private GameState(){
             this.mapsOverTime[0] = new MapState(mapSize);
         }
@@ -90,7 +90,12 @@ namespace TimeRTS.Game
             else {
                 GameRenderer.scale *= (1 * scrollDiff * SCROLL_SENSITIVITY);
             }
-
+            if (InputHandler.IsMouseDown()) {
+                this.GetCurrentViewedMap().clearPosition(GameRenderer.ScreenToIsometric(InputHandler.MousePosition().ToVector2(), this.GetCurrentViewedMap()));
+            }
+            if (InputHandler.WasPressed(Keys.R)) {
+                GameRenderer.cameraOffset = new Vector2(0, 0);
+            }
             if (InputHandler.IsPressed(Keys.S)) {
                 GameRenderer.cameraOffset.Y -= MOVE_SENSITIVITY;
             }
