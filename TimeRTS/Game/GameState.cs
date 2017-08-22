@@ -91,7 +91,7 @@ namespace TimeRTS.Game
                 GameRenderer.scale *= (1 * scrollDiff * SCROLL_SENSITIVITY);
             }
             if (InputHandler.IsMouseDown()) {
-                this.GetCurrentViewedMap().clearPosition(GameRenderer.ScreenToIsometric(InputHandler.MousePosition().ToVector2(), this.GetCurrentViewedMap()));
+                Debug.WriteLine(GameRenderer.ScreenToIsometric(InputHandler.MousePosition().ToVector2(), this.GetCurrentViewedMap()));
             }
             if (InputHandler.WasPressed(Keys.R)) {
                 GameRenderer.cameraOffset = new Vector2(0, 0);

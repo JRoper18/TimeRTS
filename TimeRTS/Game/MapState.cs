@@ -17,13 +17,19 @@ namespace TimeRTS.Game
         /// The map at on a single turn. The map should NOT be able to be edited publicly. GameObjects can edit own their position, which will update in the GameState. 
         /// </summary>
         /// <param name="mapArray">An array of GameObjects to use. </param>
+        public readonly Vector3 center;
+        public readonly Vector3 size;
         public MapState(GameObject[,,] mapArray) {
             this.map = mapArray;
+            this.size = new Vector3(mapArray.GetLength(0), mapArray.GetLength(1), mapArray.GetLength(2));
+            this.center = (this.size - Vector3.One) / 2;
         }
         public MapState(Vector3 size){
             Random random = new Random();
             map = new GameObject[(int)size.X,(int)size.Y,(int)size.Z];
-            for(int x = 0; x<size.X; x++)
+            this.size = size;
+            this.center = (this.size - Vector3.One) / 2;
+            for (int x = 0; x<size.X; x++)
             {
                 for(int y = 0; y<size.Y; y++)
                 {

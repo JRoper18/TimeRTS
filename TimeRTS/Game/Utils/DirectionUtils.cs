@@ -26,5 +26,11 @@ namespace TimeRTS.Game {
             }
             return new Vector3(0, 0, 0);
         }
+        public static int GetAngle(Direction dir) {
+            if(dir == Direction.NORTHEAST) {
+                return 0;
+            }
+            return 360 - ((int)dir) * 90;
+        }
     }
 }

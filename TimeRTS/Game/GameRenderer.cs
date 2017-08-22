@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TimeRTS.Game.Utils;
 
 namespace TimeRTS.Game
 {
@@ -15,7 +16,8 @@ namespace TimeRTS.Game
         private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
         public static float scale = 1;
         public static Vector2 cameraOffset = new Vector2((GameState.WINDOW_WIDTH / 2), 100);
-        private static Direction cameraDirection = Direction.NORTHEAST;
+        private static Direction cameraDirection = Direction.SOUTHEAST;
+        private static Vector3 cameraFocus = Vector3.Zero;
         /*
          * Camera directions work like this:
          *           Y  /     --       \  X   
@@ -85,32 +87,8 @@ namespace TimeRTS.Game
                     currentY = (increasingY) ? 0 : (int)size.Y - 1;
                 }
             }
-            spriteBatch.End();
-        }
-        private static Vector3 RotatePoint(Vector3 point, Vector3 mapSize) {
-            Vector2 temp2D = new Vector2(point.X, point.Y);
-            Vector2 rotated2D = RotatePoint(temp2D, mapSize);
-            return new Vector3(rotated2D.X, rotated2D.Y, point.Z);
-        }
 
-        private static Vector2 RotatePoint(Vector2 point, Vector3 mapSize) {
-            Vector2 center = new Vector2((mapSize.X-1)/2, (mapSize.Y-1)/2);
-            Vector2 translated = point - center;
-            Vector2 rotated = point;
-            switch (cameraDirection) {
-                case Direction.NORTHEAST:
-                    return point;
-                case Direction.SOUTHEAST:
-                    rotated = new Vector2(translated.Y, -translated.X);
-                    break;
-                case Direction.SOUTHWEST:
-                    rotated = new Vector2(-translated.X, -translated.Y);
-                    break;
-                case Direction.NORTHWEST:
-                    rotated = new Vector2(-translated.Y, translated.X);
-                    break;
-            }
-            return rotated + center;
+            spriteBatch.End();
         }
         /// <summary>
         /// Loads all game content and textures.
@@ -127,7 +105,7 @@ namespace TimeRTS.Game
         /// <param name="spriteBatch">The spritebatch to render onto.</param>
         /// <param name="map">The map that we are rendering from.</param>
         private static void RenderColumn(Vector2 position, SpriteBatch spriteBatch, MapState map) {
-            Vector2 rotated = RotatePoint(position, map.getSize());
+            Vector2 rotated = VectorUtils.RotateAroundOrigin(position, DirectionUtils.GetAngle(cameraDirection), VectorUtils.To2(map.center));
             for (int z = 0; z < map.getSize().Z; z++) {
                 Vector3 currentPosition = new Vector3(rotated.X, rotated.Y, z);
                 GameObject currentTile = map.getTileAtPosition(new Vector3(position.X, position.Y, z));
@@ -177,7 +155,7 @@ namespace TimeRTS.Game
                 if(isoY < 0 || isoX < 0 || isoY >= size.Y || isoX >= size.X) {
                     continue; //Don't check non-existent tiles. 
                 }
-                Vector3 isoPosition = RotatePoint(new Vector3((int)isoX, (int)isoY, z), size);
+                Vector3 isoPosition = VectorUtils.To3(VectorUtils.RotateAroundOrigin(new Vector2((int) isoX, (int) isoY), DirectionUtils.GetAngle(cameraDirection), VectorUtils.To2(map.center)),z);
                 GameObject possible = map.getTileAtPosition(isoPosition);
                 if(possible != null) {
                     return isoPosition;
@@ -197,13 +175,13 @@ namespace TimeRTS.Game
             else {
                 cameraDirection++;
             }
-            cameraOffset = IsometricToScreen(RotatePoint(previousIsometricFocus, map.getSize()));
+            cameraOffset -= IsometricToScreen(VectorUtils.To3(VectorUtils.RotateAroundOrigin(VectorUtils.To2(previousIsometricFocus), -90, VectorUtils.To2(map.center)), previousIsometricFocus.Z));
+            cameraOffset += new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2);
         }
         public static void RotateCameraClockwise() {
             MapState map = GameState.Instance.GetCurrentViewedMap();
             Vector3 previousIsometricFocus;
             previousIsometricFocus = ScreenToIsometric(new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2), map);
-            map.clearPosition(previousIsometricFocus);
             Debug.WriteLine(previousIsometricFocus);
             if (cameraDirection== Direction.NORTHEAST) {
                 cameraDirection= Direction.NORTHWEST;
@@ -211,14 +189,11 @@ namespace TimeRTS.Game
             else {
                 cameraDirection--;
             }
-            cameraOffset = IsometricToScreen(RotatePoint(previousIsometricFocus, map.getSize()));
+            cameraOffset -= IsometricToScreen(VectorUtils.To3(VectorUtils.RotateAroundOrigin(VectorUtils.To2(previousIsometricFocus), 90, VectorUtils.To2(map.center)), previousIsometricFocus.Z));
+            cameraOffset += new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2);
         }
         public static Direction GetDirection() {
             return cameraDirection;
-        }
-
-        public static void MoveCameraToPoint(Vector3 isoPoint) {
-
         }
     }
 }

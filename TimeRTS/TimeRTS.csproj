@@ -46,7 +46,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Game\Commands\Command.cs" />
     <Compile Include="Game\Commands\MoveForwardCommand.cs" />
-    <Compile Include="Game\DirectionUtils.cs" />
+    <Compile Include="Game\Utils\DirectionUtils.cs" />
     <Compile Include="Game\GameObject.cs" />
     <Compile Include="Game\GameObjectFactory.cs" />
     <Compile Include="Game\GameObjectTexture.cs" />
@@ -59,6 +59,7 @@
     <Compile Include="Game\RenderData.cs" />
     <Compile Include="Game\TurnComponents\MoveForwardTurnComponent.cs" />
     <Compile Include="Game\TurnComponents\TurnComponent.cs" />
+    <Compile Include="Game\Utils\VectorUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
