@@ -9,7 +9,10 @@ namespace TimeRTS.Game.Utils {
     public static class VectorUtils {
         public static Vector2 RotateAroundOrigin(Vector2 point, float degrees, Vector2 origin) {
             Vector2 offsetPoint = point - origin;
-            return RotateAroundOrigin(offsetPoint, degrees) + origin;
+            return (RotateAroundOrigin(offsetPoint, degrees) + origin);
+        }
+        public static Vector3 RotateAroundOrigin3D(Vector3 point, float degrees, Vector2 origin) {
+            return To3(RotateAroundOrigin(To2(point), degrees, origin), point.Z);
         }
         public static Vector2 RotateAroundOrigin(Vector2 point, float degrees) {
             float rad = (float)(degrees * Math.PI / 180);

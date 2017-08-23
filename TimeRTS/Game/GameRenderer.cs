@@ -8,16 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using TimeRTS.Game.Utils;
 
-namespace TimeRTS.Game
-{
-    static class GameRenderer
-    {
+namespace TimeRTS.Game {
+    static class GameRenderer {
         private const int TILE_HEIGHT = 110;
-        private const int TILE_WIDTH = (int) (TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
+        private const int TILE_WIDTH = (int)(TILE_HEIGHT * 0.886); //Multiply by sqrt(3)/2
         public static float scale = 1;
-        public static Vector2 cameraOffset = new Vector2((GameState.WINDOW_WIDTH / 2), 100);
-        private static Direction cameraDirection = Direction.SOUTHEAST;
-        private static Vector3 cameraFocus = Vector3.Zero;
+        public static Vector2 cameraOffset = new Vector2(0, 0);
+        private static Direction cameraDirection = Direction.NORTHEAST;
+        private static readonly Vector2 screenCenter = new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2);
         /*
          * Camera directions work like this:
          *           Y  /     --       \  X   
@@ -43,11 +41,11 @@ namespace TimeRTS.Game
             MapState mapState = state.GetCurrentViewedMap();
             MapState map = mapState;
             Vector3 size = map.getSize();
-            bool increasingX = (cameraDirection == Direction.NORTHEAST || cameraDirection== Direction.NORTHWEST);
-            bool increasingY = (cameraDirection == Direction.NORTHEAST || cameraDirection== Direction.SOUTHEAST);
+            bool increasingX = (cameraDirection == Direction.NORTHEAST || cameraDirection == Direction.NORTHWEST);
+            bool increasingY = (cameraDirection == Direction.NORTHEAST || cameraDirection == Direction.SOUTHEAST);
             bool yIsColumn = (increasingY != increasingX);
-            int currentX = (increasingX) ? 0 : (int) size.X - 1;
-            int currentY = (increasingY) ? 0 : (int) size.Y - 1;
+            int currentX = (increasingX) ? 0 : (int)size.X - 1;
+            int currentY = (increasingY) ? 0 : (int)size.Y - 1;
             while ((yIsColumn) ? ((increasingY) ? currentY < size.Y : currentY >= 0) : ((increasingX) ? currentX < size.X : currentX >= 0)) {
                 while ((yIsColumn) ? ((increasingX) ? currentX < size.X : currentX >= 0) : ((increasingY) ? currentY < size.Y : currentY >= 0)) {
                     RenderColumn(new Vector2(currentX, currentY), spriteBatch, map);
@@ -113,8 +111,8 @@ namespace TimeRTS.Game
                     continue;
                 }
                 RenderData currentRenderData = currentTile.GetRenderData();
-                Vector2 screenPosition = IsometricToScreen(currentPosition);
-                spriteBatch.Draw(currentRenderData.texture, new Rectangle((int) screenPosition.X, (int) screenPosition.Y, (int) ((float) TILE_WIDTH * scale), (int)((float)TILE_HEIGHT * scale)), currentRenderData.sourceRectangle, Color.White);
+                Vector2 screenPosition = GetIsometricRenderPosition(currentPosition);
+                spriteBatch.Draw(currentRenderData.texture, new Rectangle((int)screenPosition.X, (int)screenPosition.Y, (int)((float)TILE_WIDTH * scale), (int)((float)TILE_HEIGHT * scale)), currentRenderData.sourceRectangle, Color.White);
             }
         }
         /// <summary>
@@ -122,12 +120,15 @@ namespace TimeRTS.Game
         /// </summary>
         /// <param name="point">The isometric point</param>
         /// <returns>The equivalent screen coordinates</returns>
-        public static Vector2 IsometricToScreen(Vector3 point) {
+        private static Vector2 GetIsometricRenderPosition(Vector3 point) {
             int isoX = (int)(point.X - point.Z);
             int isoY = (int)(point.Y - point.Z);
             float screenX = scale * ((isoX - isoY) * TILE_WIDTH / 2);
             float screenY = scale * ((isoY + isoX) * (TILE_HEIGHT / 4));
-            return new Vector2(screenX + cameraOffset.X, screenY + cameraOffset.Y);
+            return new Vector2(screenX, screenY) + cameraOffset;
+        }
+        private static Vector3 GetCameraFocus() {
+            return ScreenToIsometric(new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2), GameState.Instance.GetCurrentViewedMap());
         }
         public static Vector3 ScreenToIsometric(Vector2 point, MapState map) {
             Vector2 offset = (point - cameraOffset);
@@ -148,52 +149,59 @@ namespace TimeRTS.Game
             for (float z = size.Z - 1; z >= 0; z--) {
                 float isoY = z - ((tempX - tempY) / 2);
                 float isoX = tempX + isoY;
-                if(z == 0) {
+                if (z == 0) {
                     //Count beneath the map as a tile. 
-                    return new Vector3((int)isoX, (int)isoY, z);
+                    return VectorUtils.RotateAroundOrigin3D(new Vector3((int)isoX, (int)isoY, z), -DirectionUtils.GetAngle(cameraDirection), VectorUtils.To2(map.center));
                 }
-                if(isoY < 0 || isoX < 0 || isoY >= size.Y || isoX >= size.X) {
+                if (isoY < 0 || isoX < 0 || isoY >= size.Y || isoX >= size.X) {
                     continue; //Don't check non-existent tiles. 
                 }
-                Vector3 isoPosition = VectorUtils.To3(VectorUtils.RotateAroundOrigin(new Vector2((int) isoX, (int) isoY), DirectionUtils.GetAngle(cameraDirection), VectorUtils.To2(map.center)),z);
-                GameObject possible = map.getTileAtPosition(isoPosition);
-                if(possible != null) {
+                Vector2 flatPos = new Vector2((int)isoX, (int)isoY);
+                Vector2 rotated = VectorUtils.RotateAroundOrigin(flatPos, -DirectionUtils.GetAngle(cameraDirection), VectorUtils.To2(map.center));
+                Vector3 isoPosition = new Vector3(rotated.X, rotated.Y, z);
+                GameObject possible = map.getTileAtPosition(new Vector3(flatPos.X, flatPos.Y, z));
+                if (possible != null) {
                     return isoPosition;
                 }
-                
             }
             throw new Exception("Position is off-map");
+        }
+        public static void ZoomIn() {
+            Vector3 focus = GetCameraFocus();
         }
         public static void RotateCameraCounterClockwise() {
             MapState map = GameState.Instance.GetCurrentViewedMap();
             Vector3 previousIsometricFocus;
-            previousIsometricFocus = ScreenToIsometric(new Vector2(GameState.WINDOW_WIDTH/2, GameState.WINDOW_HEIGHT/2), map);
-            Debug.WriteLine(previousIsometricFocus);
-            if (cameraDirection== Direction.NORTHWEST) {
-                cameraDirection= Direction.NORTHEAST;
+            previousIsometricFocus = GetCameraFocus();
+            if (cameraDirection == Direction.NORTHWEST) {
+                cameraDirection = Direction.NORTHEAST;
             }
             else {
                 cameraDirection++;
             }
-            cameraOffset -= IsometricToScreen(VectorUtils.To3(VectorUtils.RotateAroundOrigin(VectorUtils.To2(previousIsometricFocus), -90, VectorUtils.To2(map.center)), previousIsometricFocus.Z));
-            cameraOffset += new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2);
         }
         public static void RotateCameraClockwise() {
             MapState map = GameState.Instance.GetCurrentViewedMap();
             Vector3 previousIsometricFocus;
-            previousIsometricFocus = ScreenToIsometric(new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2), map);
-            Debug.WriteLine(previousIsometricFocus);
-            if (cameraDirection== Direction.NORTHEAST) {
-                cameraDirection= Direction.NORTHWEST;
+            previousIsometricFocus = GetCameraFocus();
+            if (cameraDirection == Direction.NORTHEAST) {
+                cameraDirection = Direction.NORTHWEST;
             }
             else {
                 cameraDirection--;
             }
-            cameraOffset -= IsometricToScreen(VectorUtils.To3(VectorUtils.RotateAroundOrigin(VectorUtils.To2(previousIsometricFocus), 90, VectorUtils.To2(map.center)), previousIsometricFocus.Z));
-            cameraOffset += new Vector2(GameState.WINDOW_WIDTH / 2, GameState.WINDOW_HEIGHT / 2);
+            MoveCameraToPosition(new Vector3(0, 0, 0));
         }
         public static Direction GetDirection() {
             return cameraDirection;
+        }
+        public static void MoveCameraToPosition(Vector3 pos) {
+            cameraOffset = GetIsometricRenderPosition(VectorUtils.RotateAroundOrigin3D(GameState.mapSize - pos, DirectionUtils.GetAngle(cameraDirection), VectorUtils.To2(GameState.mapSize / 2))) - cameraOffset - new Vector2(0, GetMapPixelSize().Y) + screenCenter;
+        }
+        private static Vector2 GetMapPixelSize() {
+            Vector3 size = GameState.mapSize;
+            int max = (int) Math.Max(size.X, size.Y);
+            return new Vector2(max * TILE_WIDTH / 2, (max + 2 + size.Z) * (TILE_HEIGHT / 2)) * scale;
         }
     }
 }
